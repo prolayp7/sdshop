@@ -1,17 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { BadgeCheck, Headphones, LockKeyhole, RefreshCw, ShieldCheck, Truck } from "lucide-react";
+import { Gauge, Headphones, RefreshCw, Shield, ShieldCheck } from "lucide-react";
 import { useApi } from "@/lib/use-api";
 import type { FooterColumn } from "@/lib/api";
 import styles from "./footer.module.css";
 
 const trustItems = [
-  { icon: LockKeyhole, title: "Secure Checkout", detail: "Protected payments" },
-  { icon: ShieldCheck, title: "Verified Products", detail: "Authentic media, guaranteed" },
-  { icon: BadgeCheck, title: "Lab Tested", detail: "Performance you can trust" },
-  { icon: Truck, title: "Express Delivery", detail: "Fast dispatch across India" },
-  { icon: RefreshCw, title: "Easy Returns", detail: "Simple return support" },
+  { icon: ShieldCheck, color: "#39c7ff", title: "100% Genuine Direct Import", detail: "Factory-direct authenticated serial numbers with customs clearance seal." },
+  { icon: Gauge, color: "#39c7ff", title: "3000 MB/s Lab Verified", detail: "Thermal throttled stress-tested batch benchmark certificates included." },
+  { icon: Shield, color: "#39c7ff", title: "5-Year Replacement Warranty", detail: "Direct Indian replacement guarantee on all cinema and V90 class flash media." },
+  { icon: RefreshCw, color: "#22c55e", title: "Hassle-Free Indian RMA", detail: "Doorstep express reverse-pickup across 19,000+ pin codes in India." },
 ];
 
 // Shown until/unless an admin-managed "footer" menu exists (Admin -> Menus).
@@ -42,7 +41,7 @@ export default function Footer() {
   return <footer className={styles.footer}>
     <div className={styles.inner}>
       <div className={styles.trust} aria-label="Shopping benefits">
-        {trustItems.map(({ icon: Icon, title, detail }) => <div className={styles.trustItem} key={title}><Icon size={22} strokeWidth={2.3} aria-hidden="true" /><span><strong>{title}</strong><small>{detail}</small></span></div>)}
+        {trustItems.map(({ icon: Icon, color, title, detail }) => <div className={styles.trustItem} key={title}><span className={styles.trustIcon} style={{ color }}><Icon size={18} strokeWidth={2.3} aria-hidden="true" /></span><span><strong>{title}</strong><small>{detail}</small></span></div>)}
       </div>
       <div className={styles.columns}>
         {columns.map((column) => <div className={styles.column} key={column.title}><h2>{column.title}</h2>

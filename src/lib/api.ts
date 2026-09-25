@@ -193,6 +193,18 @@ export interface ApiHomeBundle {
       ctaUrl: string | null;
       secondaryCtaLabel: string | null;
       secondaryCtaUrl: string | null;
+      headlineHighlight: string | null;
+      badgeLabel: string | null;
+      showcaseLabel: string | null;
+      metrics: { label: string; value: string }[] | null;
+      productName: string | null;
+      productSubline: string | null;
+      specs: string[] | null;
+      visualKind: string | null;
+      visualCapacity: string | null;
+      visualRating: string | null;
+      visualCompanionKind: string | null;
+      visualCompanionCapacity: string | null;
     }[];
     badges: { id: number; label: string; icon: string | null }[];
   };

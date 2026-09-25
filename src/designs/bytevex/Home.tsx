@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Box, Camera, Check, ChevronDown, Database, HardDrive, Search, ShieldCheck, Smartphone, Star, Video } from "lucide-react";
+import { ArrowRight, BadgeCheck, Box, Camera, Check, Database, HardDrive, HelpCircle, Receipt, RefreshCw, Search, ShieldCheck, Smartphone, Star, Video } from "lucide-react";
 import { useApi } from "@/lib/use-api";
 import type { Product } from "@/lib/types";
+import type { ApiFaqCategory, HomeBundle } from "@/lib/api";
 import { useHref } from "@/lib/design-context";
 import styles from "@/designs/bytevex/home.module.css";
 import Header from "./Header";
 import Footer from "./Footer";
-import Hero from "./Hero";
+import Hero, { HeroDispatch } from "./Hero";
 import CardVisual from "./CardVisual";
 import ProductCard from "./ProductCard";
 
@@ -33,12 +34,7 @@ const guideCards = [
   { label: "FIELD GUIDE", title: "Cockpit & Highway Dashcam Series", text: "Understand endurance ratings for continuous recording." },
   { label: "STUDIO GUIDE", title: "Enterprise GST & Bulk PO Accounts", text: "Compare media for teams and repeat purchasing." },
 ];
-const faqs = [
-  ["How do I verify that a card works with my device?", "Check the card format, maximum supported capacity and speed class in your device manual. Use our device finder as a starting point, then confirm the manufacturer's requirements before buying."],
-  ["Do I need V90 for every 4K camera?", "No. Recording bit rate and codec determine the minimum sustained write speed. Many 4K cameras work with V30 or V60; higher bit rates may require V90 or CFexpress."],
-  ["Can I read UHS-II cards in a UHS-I reader?", "Usually yes. UHS-II cards are backward compatible with UHS-I readers, though transfers run at the reader's lower speed."],
-  ["What if a card is incompatible with my device?", "Check the device's supported format and capacity first. If you need help choosing, contact support with the exact device model and recording mode."],
-];
+const faqIcons = [HelpCircle, BadgeCheck, Receipt, RefreshCw];
 
 export default function Home() {
   const href = useHref();
@@ -52,10 +48,18 @@ export default function Home() {
   const productQuery = activeTab === "All products" ? "/api/products?perPage=4" : "/api/products?perPage=4&category=" + encodeURIComponent(activeTab === "microSD" ? "microsd-cards" : activeTab === "CFexpress" ? "cfexpress-cards" : "sd-cards");
   const productsRes = useApi<{ items: Product[] }>(productQuery);
   const products = productsRes.data?.items ?? [];
+  const homeRes = useApi<{ home: HomeBundle }>("/api/home");
+  const heroConfig = homeRes.data?.home.homepageSections.find((section) => section.type === "HERO")?.config ?? {};
+  const dispatch: HeroDispatch = typeof heroConfig.dispatchText === "string" || typeof heroConfig.dispatchDescription === "string"
+    ? { enabled: heroConfig.dispatchEnabled !== false, text: typeof heroConfig.dispatchText === "string" ? heroConfig.dispatchText : "", description: typeof heroConfig.dispatchDescription === "string" ? heroConfig.dispatchDescription : "" }
+    : null;
+  const trustLine = typeof heroConfig.trustLine === "string" ? heroConfig.trustLine : null;
+  const faqsRes = useApi<{ items: ApiFaqCategory[] }>("/api/faqs");
+  const faqs = (faqsRes.data?.items ?? []).flatMap((category) => category.faqs);
   return <>
     <Header />
     <div className={styles.site}>
-      <Hero />
+      <Hero slides={homeRes.data?.home.hero.slides ?? []} badges={homeRes.data?.home.hero.badges ?? []} dispatch={dispatch} trustLine={trustLine} />
 
       <section id="device-finder" className={styles.section + " " + styles.finder}><div className={styles.sectionHead}><div><span className={styles.kicker}>MATCH YOUR WORKFLOW</span><h2>Precision engineered for your gear</h2></div><p>Select your device type to explore cards with the right format and performance class.</p></div><div className={styles.deviceGrid}>{categories.map(({ name, detail, icon: Icon, query: q }) => <Link href={href.category({ q })} key={name} className={styles.device}><Icon size={25} /><strong>{name}</strong><span>{detail}</span><ArrowRight size={14} /></Link>)}</div></section>
 
@@ -75,7 +79,7 @@ export default function Home() {
 
       <section className={styles.section + " " + styles.knowledge}><div className={styles.sectionHead}><div><span className={styles.kicker}>THE FLASH MEMORY KNOWLEDGE HUB</span><h2>Learn before you load.</h2></div><Link href="/blog">Read all articles <ArrowRight size={16} /></Link></div><div className={styles.knowledgeGrid}><Link href="/blog"><span>GUIDE · COMPATIBILITY</span><h3>The SD card speed labels that actually matter</h3><p>A practical way to read UHS, V-class and app performance markings.</p><strong>Read article <ArrowRight size={14} /></strong></Link><Link href="/blog"><span>GUIDE · CAMERAS</span><h3>How to choose media for 4K and 8K recording</h3><p>Start with your camera&apos;s codec and bitrate, then choose the right sustained speed.</p><strong>Read article <ArrowRight size={14} /></strong></Link><Link href="/blog"><span>GUIDE · WORKFLOW</span><h3>Card readers and the path to faster offloads</h3><p>The card, reader and computer port all shape transfer performance.</p><strong>Read article <ArrowRight size={14} /></strong></Link></div></section>
 
-      <section className={styles.section + " " + styles.faq}><div className={styles.sectionHead}><div><span className={styles.kicker}>BUYER QUESTIONS, ANSWERED</span><h2>Frequently asked questions</h2></div></div><div className={styles.faqGrid}>{faqs.map(([question, answer]) => <details key={question}><summary>{question}<ChevronDown size={17} /></summary><p>{answer}</p></details>)}</div></section>
+      {faqs.length ? <section className={styles.section + " " + styles.faq}><div className={styles.sectionHead}><div><span className={styles.kicker}>Help &amp; technical inquiries</span><h2>Frequently Asked Questions</h2></div></div><div className={styles.faqGrid}>{faqs.map((faq, index) => { const Icon = faqIcons[index % faqIcons.length]; return <div className={styles.faqCard} key={faq.id}><header><h3>{faq.question}</h3><Icon size={17} /></header><p>{faq.answer}</p></div>; })}</div></section> : null}
       <div className={styles.finalStrip}><span><Check size={17} /> Compare formats</span><span><Check size={17} /> Check your device</span><span><Check size={17} /> Choose by speed class</span><Link href={href.category()}>Browse all media <ArrowRight size={16} /></Link></div>
     </div>
     <Footer />
