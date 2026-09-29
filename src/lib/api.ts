@@ -425,6 +425,44 @@ export function fetchTestimonials() {
   return apiGet<{ data: ApiTestimonial[] }>("testimonials").then((r) => r.data);
 }
 
+export interface ApiMegaMenuEntry {
+  title: string;
+  detail: string;
+  href: string;
+  icon: string;
+  badge: string;
+  featured: boolean;
+}
+
+export interface ApiMegaMenuSection {
+  id: string;
+  title: string;
+  icon: string;
+  entries: ApiMegaMenuEntry[];
+  runtimeTitle?: string;
+  metrics?: { value: string; label: string }[];
+}
+
+export interface ApiMegaMenuContent {
+  sections: ApiMegaMenuSection[];
+  promo: { eyebrow: string; title: string; description: string; detail: string; benchmark: string; voucherLabel: string; voucherCode: string; ctaLabel: string; href: string };
+  footer: { message: string; emphasis: string; detail: string; firstLinkLabel: string; firstLinkHref: string; secondLinkLabel: string; secondLinkHref: string };
+}
+
+export interface ApiHeaderMenuItem {
+  id: number;
+  label: string;
+  href: string | null;
+  sortOrder: number;
+  category: ApiCategoryRef | null;
+  children: { id: number; label: string; href: string | null; sortOrder: number; category: ApiCategoryRef | null }[];
+  megaMenuPanel: { content: ApiMegaMenuContent | null } | null;
+}
+
+export function fetchHeaderMenu() {
+  return apiGetOrNull<{ items: ApiHeaderMenuItem[] }>("menus/header", 0).then((menu) => menu ?? { items: [] });
+}
+
 // Site-wide config authored in ukshop-admin's Settings > General tab. Every
 // field is optional - the value is `{}` until an admin fills the form in, so
 // callers fall back to hardcoded defaults (theme.config.ts) for anything unset.
@@ -449,13 +487,13 @@ export async function fetchGeneralSettings(): Promise<ApiGeneralSettings> {
 }
 
 export interface FooterColumn { title: string; links: { label: string; href: string }[] }
-interface ApiFooterLink { label: string; href: string | null; category: { slug: string } | null }
+interface ApiFooterLink { label: string; href: string | null; category: { title: string; slug: string } | null }
 
 /** Admin-managed footer link columns (Menus -> "footer"): top-level items are column titles, their children the links. Empty when the menu is missing. */
 export async function fetchFooterMenu(): Promise<FooterColumn[]> {
   const menu = await apiGetOrNull<{ items: (ApiFooterLink & { children: ApiFooterLink[] })[] }>("menus/footer");
   const toLink = (item: ApiFooterLink) => {
-    const href = item.href || (item.category ? `/category?cat=${encodeURIComponent(item.category.slug)}` : null);
+    const href = item.href || (item.category ? `/c/${encodeURIComponent(item.category.slug)}` : null);
     return href ? { label: item.label, href } : null;
   };
   return (menu?.items ?? []).map((column) => ({ title: column.label, links: column.children.map(toLink).filter((link): link is { label: string; href: string } => link !== null) })).filter((column) => column.links.length > 0);

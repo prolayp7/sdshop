@@ -71,7 +71,7 @@
 .navLinks{min-width:0;flex:1;display:flex;align-items:center;gap:18px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;white-space:nowrap}
 .navLinks::-webkit-scrollbar{display:none}
 .navLinks a{flex:none;color:#f3f7fb;font-size:14px;font-weight:700;line-height:1.2}
-.navLinks a:hover{color:#39c7ff}
+.navLinks a:hover{color:#39c7ff}.navLinks .menuLinkButton{appearance:none;flex:none;border:0;padding:0;background:transparent;color:#f3f7fb;font:inherit;font-size:14px;font-weight:700;line-height:1.2;cursor:pointer;white-space:nowrap}.navLinks .menuLinkButton:hover{color:#39c7ff}
 .navLinks .deviceNav{display:inline-flex;align-items:center;gap:6px}
 .navLinks .deviceNav svg{color:#39c7ff;flex:none}
 .megaMenu{position:absolute;z-index:30;top:calc(100% + 1px);left:35px;right:35px;padding:23px 25px 25px;background:#0d1925;border:1px solid #ffffff29;border-radius:0 0 16px 16px;box-shadow:0 24px 44px #0008;color:#fff}

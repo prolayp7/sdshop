@@ -16,13 +16,14 @@ const trustItems = [
 // Shown until/unless an admin-managed "footer" menu exists (Admin -> Menus).
 const fallbackColumns: FooterColumn[] = [
   { title: "Shop by Category", links: [
-    { label: "SD Cards (UHS-I & UHS-II)", href: "/category?cat=SD%20Cards" }, { label: "microSD Cards", href: "/category?cat=microSD%20Cards" },
-    { label: "CFexpress Type A & B", href: "/category?cat=CFexpress%20Cards" }, { label: "Cinema SSD & Enclosures", href: "/category?q=SSD" },
-    { label: "Card Readers & Hubs", href: "/category?cat=Card%20Readers" }, { label: "Adapters & Accessories", href: "/category?cat=Card%20Adapters" },
-    { label: "All Products", href: "/category" },
+    { label: "SD Cards (UHS-I & UHS-II)", href: "/c/sd-cards" }, { label: "microSD Cards", href: "/c/microsd-cards" },
+    { label: "CFexpress Type A & B", href: "/c/cfexpress-cards" }, { label: "Cinema SSD & Enclosures", href: "/c?q=SSD" },
+    { label: "Card Readers & Hubs", href: "/c/card-readers" }, { label: "Adapters & Accessories", href: "/c/card-adapters" },
+    { label: "All Products", href: "/c" },
+    { label: "Creator Deals", href: "/c?deals=1" }, { label: "Bulk & Studio Orders", href: "/pages/bulk-orders" },
   ] },
   { title: "Trade & Pro", links: [
-    { label: "Pro Account", href: "/account" }, { label: "Creator Deals", href: "/category?deals=1" }, { label: "Bulk & Studio Orders", href: "/pages/bulk-orders" },
+    { label: "Pro Account", href: "/account" }, { label: "Creator Deals", href: "/c?deals=1" }, { label: "Bulk & Studio Orders", href: "/pages/bulk-orders" },
     { label: "Corporate Inquiries", href: "/pages/corporate-inquiries" }, { label: "GST Invoice Support", href: "/pages/gst-invoicing" }, { label: "Express Dispatch", href: "/pages/shipping" },
   ] },
   { title: "Customer Support", links: [
@@ -30,8 +31,8 @@ const fallbackColumns: FooterColumn[] = [
     { label: "Delivery Information", href: "/pages/shipping" }, { label: "Frequently Asked Questions", href: "/faqs" }, { label: "Contact Support", href: "/pages/contact" },
   ] },
   { title: "Guides & Tools", links: [
-    { label: "Buying Guides", href: "/blog" }, { label: "Compare Products", href: "/compare" }, { label: "Find V90 SD Cards", href: "/category?q=V90" },
-    { label: "CFexpress Finder", href: "/category?q=CFexpress" }, { label: "Choose a Card Reader", href: "/category?q=reader" }, { label: "Storage FAQs", href: "/faqs" },
+    { label: "Buying Guides", href: "/blog" }, { label: "Compare Products", href: "/compare" }, { label: "Find V90 SD Cards", href: "/c?q=V90" },
+    { label: "CFexpress Finder", href: "/c?q=CFexpress" }, { label: "Choose a Card Reader", href: "/c?q=reader" }, { label: "Storage FAQs", href: "/faqs" },
   ] },
 ];
 

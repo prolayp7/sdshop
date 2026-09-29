@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  async redirects() {
+    return [{ source: "/category", destination: "/c", permanent: true }];
+  },
   images: {
     remotePatterns: [
       {

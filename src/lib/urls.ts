@@ -13,11 +13,18 @@ function qs(params?: Record<string, string | number | undefined>): string {
   return s ? `?${s}` : "";
 }
 
+const categorySlug = (value: string) => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
 export function makeHref(slug = "") {
   const base = slug ? `/${slug}` : "";
   return {
     home: () => base || "/",
-    category: (params?: { cat?: string; sub?: string; sort?: string; featured?: number; deals?: number; q?: string }) => `${base}/category${qs(params)}`,
+    category: (params?: { cat?: string; sub?: string; sort?: string; featured?: number; deals?: number; q?: string }) => {
+      const { cat, sub, deals, ...query } = params ?? {};
+      const name = sub || cat;
+      if (name) return `${base}/c/${encodeURIComponent(categorySlug(name))}${qs({ ...query, deals })}`;
+      return `${base}/c${qs(params)}`;
+    },
     product: (id: number | string) => `${base}/product/${id}`,
     brand: (name: string) => `${base}/brand/${encodeURIComponent(name)}`,
     brands: () => `${base}/brands`,

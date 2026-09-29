@@ -124,7 +124,7 @@ export default function CategoryPage({ category, tree, initialMin, initialMax, i
       </div>{benefits.length ? <div className="category-benefits">{benefits.map((benefit) => <div key={benefit.id}>{benefit.icon ? <Icon id={benefit.icon} w={21} /> : <Package size={21} />}<span>{benefit.label}</span></div>)}</div> : null}</div></section>
       {children.length > 0 ? <section className="category-subcategories"><div className="category-wrap">
         <div className="category-section-label"><h2>Shop by {category?.title} Subcategory</h2><a href="#category-results">View all products <ArrowRight size={16} /></a></div>
-        <div className="category-subcategory-grid">{children.map((child) => <Link key={child.id} href={href.category({ cat: child.slug })} className="category-subcategory">
+        <div className="category-subcategory-grid">{children.map((child) => <Link key={child.id} href={href.category({ sub: child.slug })} className="category-subcategory">
           {child.thumbnailImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={child.thumbnailImage} alt={child.thumbnailImageAlt || ""} width={32} height={32} />
@@ -136,7 +136,7 @@ export default function CategoryPage({ category, tree, initialMin, initialMax, i
         <button className="category-mobile-filter" onClick={() => setFiltersOpen(!filtersOpen)} aria-expanded={filtersOpen} aria-controls="category-filters"><SlidersHorizontal size={18} /> Refine results</button>
         <aside id="category-filters" className={`category-sidebar${filtersOpen ? " is-open" : ""}`}>
           <div className="category-refine"><h2><SlidersHorizontal size={15} /> Refine Specifications</h2><span>{activeFilters.length} Active</span></div>
-          {children.length > 0 ? <details className="rs-group" open><summary>Category / Sub-Type<ChevronDown size={14} /></summary><div className="rs-list">{children.map((child) => <Link key={child.id} href={href.category({ cat: child.slug })} className="rs-check"><i /><span>{child.title}</span><small>{child.productCount}</small></Link>)}</div></details> : null}
+          {children.length > 0 ? <details className="rs-group" open><summary>Category / Sub-Type<ChevronDown size={14} /></summary><div className="rs-list">{children.map((child) => <Link key={child.id} href={href.category({ sub: child.slug })} className="rs-check"><i /><span>{child.title}</span><small>{child.productCount}</small></Link>)}</div></details> : null}
           <details className="rs-group" open><summary>Brand<ChevronDown size={14} /></summary>
             <input className="rs-search" type="search" placeholder="Search brand..." aria-label="Search brand" value={brandSearch} onChange={(event) => setBrandSearch(event.target.value)} />
             <div className="rs-list rs-scroll">{facets?.brands.filter((brand) => brand.title.toLowerCase().includes(brandSearch.trim().toLowerCase())).map((brand) => <label key={brand.slug} className="rs-check"><input type="checkbox" checked={brands.includes(brand.slug)} onChange={() => { setBrands(brands.includes(brand.slug) ? brands.filter((b) => b !== brand.slug) : [...brands, brand.slug]); }} /><span>{brand.title}</span><small>{brand.count}</small></label>)}{!facets?.brands.length ? <p className="category-muted">{facetsRes.loading ? "Loading…" : "No brands"}</p> : null}</div>

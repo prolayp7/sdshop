@@ -2,26 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeftRight,  BadgeCheck, ChevronDown, ClipboardCheck, Cpu, Headphones, Heart, Menu, ReceiptText, ShoppingBag, Truck, UserRound, X } from "lucide-react";
+import { ArrowLeftRight, BadgeCheck, ChevronDown, ClipboardCheck, Headphones, Heart, Menu, ReceiptText, ShoppingBag, Truck, UserRound, X } from "lucide-react";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { useApi } from "@/lib/use-api";
-import MegaMenu from "./MegaMenu";
+import MegaMenu from "./configured-mega-menu";
 import SearchBox from "./SearchBox";
-import type { ApiCategory, ApiGeneralSettings } from "@/lib/api";
+import type { ApiCategory, ApiGeneralSettings, ApiHeaderMenuItem } from "@/lib/api";
 import { useHref } from "@/lib/design-context";
 import { BasketTotal } from "@/components/BasketBadge";
 import { useCartCount } from "@/lib/cart";
 import { useWishlist, useCompare } from "@/lib/basket";
 import { useCustomerAuth } from "@/lib/storefront-client";
 import styles from "@/designs/bytevex/home.module.css";
-
-const nav = [
-  { label: "SD Cards (UHS-II / UHS-I)", category: "SD Cards" },
-  { label: "microSD Cards", category: "microSD Cards" },
-  { label: "CFexpress Type A/B", category: "CFexpress Cards" },
-  { label: "Cinema SSD & Enclosures", query: "SSD" },
-  { label: "High-Speed Card Readers & Hubs", category: "Card Readers" },
-];
 
 export default function Header() {
   const href = useHref();
@@ -30,18 +22,20 @@ export default function Header() {
   const cartCount = useCartCount();
   const { isLoggedIn } = useCustomerAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [megaOpen, setMegaOpen] = useState(false);
+  const [megaOpenId, setMegaOpenId] = useState<number | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const settings = useApi<{ data: ApiGeneralSettings }>("/api/settings/general").data?.data ?? {};
   const menuCategoriesRes = useApi<{ items: ApiCategory[] }>("/api/categories");
+  const headerMenuRes = useApi<{ items: ApiHeaderMenuItem[] }>("/api/menus/header");
+  const menuItems = headerMenuRes.data?.items ?? [];
 
   useEffect(() => {
-    if (!megaOpen) return;
+    if (megaOpenId === null) return;
     function closeOnOutside(event: PointerEvent) {
-      if (!navRef.current?.contains(event.target as Node)) setMegaOpen(false);
+      if (!navRef.current?.contains(event.target as Node)) setMegaOpenId(null);
     }
     function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setMegaOpen(false);
+      if (event.key === "Escape") setMegaOpenId(null);
     }
     document.addEventListener("pointerdown", closeOnOutside);
     document.addEventListener("keydown", closeOnEscape);
@@ -49,7 +43,7 @@ export default function Header() {
       document.removeEventListener("pointerdown", closeOnOutside);
       document.removeEventListener("keydown", closeOnEscape);
     };
-  }, [megaOpen]);
+  }, [megaOpenId]);
   return <div className={styles.site + " " + styles.stickyTop}>
     <header className={styles.header}>
       <FlickeringGrid className={styles.headerGrid} squareSize={3} gridGap={13} color="#0a1730" maxOpacity={1} flickerChance={0.1} aria-hidden="true" />
@@ -62,7 +56,7 @@ export default function Header() {
       </div>
       <div className={styles.headerMain}>
         <Link href={href.home()} className={styles.logo} aria-label="BYTEVEX home">{settings.logo ? <span className={styles.logoAsset}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src={settings.logo} alt="" /></span> : null}</Link>
-        <SearchBox categories={menuCategoriesRes.data?.items ?? []} onOpen={() => setMegaOpen(false)} />
+        <SearchBox categories={menuCategoriesRes.data?.items ?? []} onOpen={() => setMegaOpenId(null)} />
         <div className={styles.headerActions}>
           <Link href={href.compare()} className={styles.headerIconAction}><span className={styles.actionIcon}><ArrowLeftRight size={22} /><span className={styles.countBadge}>{compareCount}</span></span><span>Compare</span></Link>
           <Link href={href.account({ tab: "wishlist" })} className={styles.headerIconAction}><span className={styles.actionIcon}><Heart size={22} /><span className={styles.countBadge}>{wishlistCount}</span></span><span>Wishlist</span></Link>
@@ -70,18 +64,20 @@ export default function Header() {
           <Link href={isLoggedIn ? href.account() : href.login()} className={styles.accountAction}><span className={styles.userCircle}><UserRound size={19} /></span><span><small>Pro Account</small><b>{isLoggedIn ? "My Account" : "Sign In"}</b></span></Link>
           <Link href={href.basket()} className={styles.cart}><span className={styles.actionIcon}><ShoppingBag size={22} />{cartCount > 0 && <span className={styles.countBadge}>{cartCount}</span>}</span><span><small>CART TOTAL</small><b><BasketTotal /></b></span></Link>
         </div>
-        <button className={styles.menuButton} onClick={() => { setMenuOpen(!menuOpen); setMegaOpen(false); }} aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
+        <button className={styles.menuButton} onClick={() => { setMenuOpen(!menuOpen); setMegaOpenId(null); }} aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
       </div>
-      <nav ref={navRef} className={styles.nav + (menuOpen ? " " + styles.navOpen : "")} aria-label="Product categories" onPointerLeave={event => { if (event.pointerType === "mouse" || event.pointerType === "pen") setMegaOpen(false); }}>
+      <nav ref={navRef} className={styles.nav + (menuOpen ? " " + styles.navOpen : "")} aria-label="Product categories" onPointerLeave={event => { if (event.pointerType === "mouse" || event.pointerType === "pen") setMegaOpenId(null); }}>
         <div className={styles.navShell}>
-          <button type="button" className={styles.shopButton} aria-expanded={megaOpen} aria-controls="shop-mega-menu" onPointerEnter={event => { if (event.pointerType === "mouse" || event.pointerType === "pen") setMegaOpen(true); }} onClick={event => { const pointerType = (event.nativeEvent as PointerEvent).pointerType; setMegaOpen(open => pointerType === "mouse" || pointerType === "pen" ? true : !open); }}><span className={styles.shopDot} />Shop Products <ChevronDown size={15} /></button>
           <div className={styles.navLinks}>
-            {nav.map(item => <Link key={item.label} onClick={() => setMegaOpen(false)} href={href.category(item.category ? { cat: item.category } : { q: item.query })}>{item.label}</Link>)}
-            <Link href="#device-finder" className={styles.deviceNav} onClick={() => setMegaOpen(false)}><Cpu size={15} /> Device Compatibility Finder</Link>
-            <Link href={href.category({ deals: 1 })} onClick={() => setMegaOpen(false)}>Pro Creator Deals</Link>
-            <Link href={href.account()} onClick={() => setMegaOpen(false)}>Studio Corporate Inquiries</Link>
+            {menuItems.map((item) => {
+              const hasPanel = Boolean(item.megaMenuPanel?.content?.sections?.length);
+              const itemHref = item.href || (item.category ? href.category({ cat: item.category.slug }) : href.category());
+              return hasPanel ? <button key={item.id} type="button" className={item.label === "Shop Products" ? styles.shopButton : styles.menuLinkButton} aria-expanded={megaOpenId === item.id} aria-controls={`mega-menu-${item.id}`} onPointerEnter={(event) => { if (event.pointerType === "mouse" || event.pointerType === "pen") setMegaOpenId(item.id); }} onClick={(event) => { const pointerType = (event.nativeEvent as PointerEvent).pointerType; setMegaOpenId((current) => pointerType === "mouse" || pointerType === "pen" || current === item.id ? (pointerType === "mouse" || pointerType === "pen" ? item.id : null) : item.id); }}>
+                {item.label === "Shop Products" ? <><span className={styles.shopDot} />{item.label}<ChevronDown size={15} /></> : <>{item.label}<ChevronDown size={13} /></>}
+              </button> : <Link key={item.id} href={itemHref} onClick={() => setMegaOpenId(null)}>{item.label}</Link>;
+            })}
           </div>
-          {megaOpen && <MegaMenu categories={menuCategoriesRes.data?.items ?? []} onNavigate={() => setMegaOpen(false)} /> }
+          {menuItems.map((item) => item.id === megaOpenId && item.megaMenuPanel?.content ? <MegaMenu key={item.id} id={`mega-menu-${item.id}`} content={item.megaMenuPanel.content} onNavigate={() => setMegaOpenId(null)} /> : null)}
         </div>
       </nav>
     </header>
