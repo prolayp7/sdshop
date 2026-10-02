@@ -30,6 +30,15 @@ const PROVIDERS: { id: Provider; label: string; blurb: string; redirect: string 
   { id: "PAYPAL", label: "PayPal", blurb: "Pay securely with your PayPal account or a card via PayPal", redirect: "PayPal" },
 ];
 
+function deliveryWindow(method: ShippingQuote): string {
+  const format = (value: string) => new Date(`${value}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  if (method.estimatedDeliveryFrom && method.estimatedDeliveryTo) {
+    return `Estimated ${format(method.estimatedDeliveryFrom)}–${format(method.estimatedDeliveryTo)}`;
+  }
+  if (method.estimatedDeliveryFrom) return `Estimated from ${format(method.estimatedDeliveryFrom)}`;
+  return method.estimatedDaysMin !== null ? `${method.estimatedDaysMin}–${method.estimatedDaysMax ?? method.estimatedDaysMin} working days` : method.carrier;
+}
+
 export default function CheckoutPage({ parts }: { parts: DesignParts }) {
   const { Header, Footer, Crumbs } = parts;
   const href = useHref();
@@ -344,7 +353,7 @@ export default function CheckoutPage({ parts }: { parts: DesignParts }) {
                         <input type="radio" name="ship" checked={m.id === shippingMethodId} onChange={() => { setShippingMethodId(m.id); toast.info("Delivery option updated", { id: "shipping-method", description: `${m.title} · ${money(m.rate)}` }); }} />
                         <span>
                           <b>{m.title}</b>
-                          {m.estimatedDaysMin !== null ? `${m.estimatedDaysMin}–${m.estimatedDaysMax} working days` : m.carrier}
+                          {deliveryWindow(m)}
                         </span>
                         <em>{m.rate === 0 ? "Free" : money(m.rate)}</em>
                       </label>

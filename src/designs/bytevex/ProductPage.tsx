@@ -29,7 +29,7 @@ export default function ProductPage() {
 
 function ProductDetail({ slug }: { slug: string }) {
   const href = useHref();
-  useRecentIds(); // kept live so basket/recently-viewed state stays consistent; see Day 4 note below
+  const recentIds = useRecentIds();
 
   const detail = useApi<{ product: Product; api: ApiProductBase }>(`/api/products/${encodeURIComponent(slug)}`);
   const categorySlug = detail.data?.api.category.slug ?? null;
@@ -43,10 +43,9 @@ function ProductDetail({ slug }: { slug: string }) {
   const related = useMemo(() => (relatedRes.data?.items ?? []).filter((x) => x.id !== p?.id).slice(0, 4), [relatedRes.data, p?.id]);
   const alsoBought = compatibleRes.data?.items ?? [];
   const recommended = useMemo(() => (recommendedRes.data?.items ?? []).filter((x) => x.id !== p?.id).slice(0, 4), [recommendedRes.data, p?.id]);
-  // Recently-viewed lookup isn't wired to live data in this pass - it needs
-  // basket.ts's Recent store to move from tracking numeric ids to slugs,
-  // which is Day 4's job (it owns the whole basket/localStorage data layer).
-  const recentlyViewed: Product[] = [];
+  const recentIdsToLoad = recentIds.filter((id) => id !== p?.id).slice(0, 4);
+  const recentlyViewedRes = useApi<{ items: Product[] }>(recentIdsToLoad.length ? `/api/products?ids=${recentIdsToLoad.join(",")}` : null);
+  const recentlyViewed = recentlyViewedRes.data?.items ?? [];
 
   useEffect(() => {
     if (p) Recent.push(p.id);

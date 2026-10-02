@@ -38,6 +38,8 @@ export interface ShippingQuote {
   carrier: string;
   estimatedDaysMin: number | null;
   estimatedDaysMax: number | null;
+  estimatedDeliveryFrom: string | null;
+  estimatedDeliveryTo: string | null;
   rate: number;
 }
 export function listShippingMethods(): Promise<ShippingQuote[]> {
@@ -145,6 +147,30 @@ export function downloadInvoice(uuid: string): Promise<Blob> {
 }
 export function cancelOrder(uuid: string, reason?: string): Promise<Order> {
   return request(`orders/${encodeURIComponent(uuid)}/cancel`, { method: "PATCH", body: JSON.stringify({ reason }) });
+}
+
+export interface GuestTrackedOrder {
+  orderNumber: string;
+  status: string;
+  paymentStatus: string;
+  placedAt: string;
+  hasInvoice: boolean;
+  shippingMethod: string | null;
+  statusHistory: { status: string; createdAt: string }[];
+  shipments: {
+    carrier: string;
+    status: string;
+    trackingNumber: string | null;
+    trackingUrl: string | null;
+    estimatedDeliveryAt: string | null;
+    deliveredAt: string | null;
+    events: { status: string; description: string | null; location: string | null; occurredAt: string }[];
+  }[];
+}
+
+export function trackGuestOrder(orderNumber: string, email: string): Promise<GuestTrackedOrder> {
+  const query = new URLSearchParams({ orderNumber: orderNumber.trim(), email: email.trim() });
+  return request(`orders/track?${query.toString()}`);
 }
 // ---- Returns (order-item level: partial quantities, several returns per order) ----
 

@@ -2,7 +2,7 @@
 
 import { request } from "./storefront-client";
 
-export type PaymentProvider = "STRIPE" | "PAYPAL" | "TWOCHECKOUT";
+export type PaymentProvider = "STRIPE" | "PAYPAL";
 
 export interface PaymentMethodInfo {
   provider: PaymentProvider;

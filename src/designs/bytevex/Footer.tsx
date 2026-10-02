@@ -27,7 +27,7 @@ const fallbackColumns: FooterColumn[] = [
     { label: "Corporate Inquiries", href: "/pages/corporate-inquiries" }, { label: "GST Invoice Support", href: "/pages/gst-invoicing" }, { label: "Express Dispatch", href: "/pages/shipping" },
   ] },
   { title: "Customer Support", links: [
-    { label: "Track Your Order", href: "/account?tab=orders" }, { label: "Returns & Refunds", href: "/pages/returns" }, { label: "Warranty & Service", href: "/pages/warranty" },
+    { label: "Track Your Order", href: "/track-order" }, { label: "Returns & Refunds", href: "/pages/returns" }, { label: "Warranty & Service", href: "/pages/warranty" },
     { label: "Delivery Information", href: "/pages/shipping" }, { label: "Frequently Asked Questions", href: "/faqs" }, { label: "Contact Support", href: "/pages/contact" },
   ] },
   { title: "Guides & Tools", links: [

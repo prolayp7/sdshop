@@ -61,7 +61,26 @@ export default function Home() {
     <div className={styles.site}>
       <Hero slides={homeRes.data?.home.hero.slides ?? []} badges={homeRes.data?.home.hero.badges ?? []} dispatch={dispatch} trustLine={trustLine} />
 
-      <section id="device-finder" className={styles.section + " " + styles.finder}><div className={styles.sectionHead}><div><span className={styles.kicker}>MATCH YOUR WORKFLOW</span><h2>Precision engineered for your gear</h2></div><p>Select your device type to explore cards with the right format and performance class.</p></div><div className={styles.deviceGrid}>{categories.map(({ name, detail, icon: Icon, query: q }) => <Link href={href.category({ q })} key={name} className={styles.device}><Icon size={25} /><strong>{name}</strong><span>{detail}</span><ArrowRight size={14} /></Link>)}</div></section>
+      <section id="device-finder" aria-labelledby="device-finder-title" className={styles.section + " " + styles.finder}>
+        <div className={styles.sectionHead}>
+          <div>
+            <h2 id="device-finder-title">Precision engineered for your gear</h2>
+          </div>
+          <p>Select your device type to explore cards with the right format and performance class.</p>
+        </div>
+        <nav className={styles.deviceGrid} aria-label="Shop by device type">
+          {categories.map(({ name, detail, icon: Icon, query: q }) => (
+            <Link href={href.category({ q })} key={name} className={styles.device}>
+              <span className={styles.deviceIcon}><Icon size={21} aria-hidden="true" /></span>
+              <span className={styles.deviceCopy}>
+                <strong>{name}</strong>
+                <span>{detail}</span>
+              </span>
+              <span className={styles.deviceArrow}><ArrowRight size={16} aria-hidden="true" /></span>
+            </Link>
+          ))}
+        </nav>
+      </section>
 
       <section className={styles.section + " " + styles.architecture}><div className={styles.sectionHead}><div><span className={styles.kicker}>FLASH ARCHITECTURES</span><h2>Primary flash architectures</h2></div><Link href={href.category()}>View all categories <ArrowRight size={16} /></Link></div><div className={styles.archGrid}>{architectures.map(item => <Link href={href.category({ cat: item.query })} className={styles.archCard} key={item.title}><span>{item.label}</span><h3>{item.title}</h3><p>{item.text}</p><div className={styles.archVisual}><CardVisual kind={item.kind} small /></div><strong>Explore range <ArrowRight size={15} /></strong></Link>)}</div></section>
 
